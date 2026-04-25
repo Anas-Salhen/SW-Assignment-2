@@ -4,7 +4,7 @@ from django.http import JsonResponse
 from django.views import View
 from django.contrib.auth import get_user_model
 from .services import AuthManager
-
+from .services import TransactionManager
 User = get_user_model()
 
 
@@ -48,3 +48,55 @@ class LoginView(View):
         return JsonResponse({
             'message': 'Login successful'
         })
+
+class AddIncomeView(View):
+    def post(self, request):
+        if not request.user.is_authenticated:
+            return JsonResponse({'error': 'Login required'}, status=401)
+            
+        data = json.loads(request.body)
+        manager = TransactionManager()
+        
+        try:
+            income, updated_balance = manager.add_income(
+                user=request.user,
+                amount=data.get('amount'),
+                source=data.get('source'),
+                description=data.get('description')
+            )
+            return JsonResponse({
+                'message': 'Income added successfully',
+                'income_id': income.id,
+                'updatedBalance': str(updated_balance)
+            }, status=201)
+        
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)  
+        
+class AddExpenseView(View):
+    def post(self, request):
+        if not request.user.is_authenticated:
+            return JsonResponse({'error': 'Login required'}, status=401)
+            
+        data = json.loads(request.body)
+        manager = TransactionManager()
+        
+        try:
+            expense, updated_balance = manager.add_expense(
+                user=request.user,
+                amount=data.get('amount'),
+                category_name=data.get('category'), 
+                method=data.get('paymentMethod'),
+                description=data.get('description')
+            )
+            
+            return JsonResponse({
+                'message': 'Expense added successfully',
+                'expense_id': expense.id,
+                'updatedBalance': str(updated_balance)
+            }, status=201)
+            
+        except ValueError as e:
+            return JsonResponse({'error': str(e)}, status=400)
+        except Exception as e:
+            return JsonResponse({'error': 'An error occurred'}, status=500)
