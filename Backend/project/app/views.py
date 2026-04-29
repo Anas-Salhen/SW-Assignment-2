@@ -5,9 +5,11 @@ from django.views import View
 from django.contrib.auth import get_user_model
 from .services import AuthManager
 from .services import TransactionManager
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 User = get_user_model()
 
-
+@method_decorator(csrf_exempt, name='dispatch')
 class RegisterView(View):
     def post(self, request):
         data = json.loads(request.body)
@@ -28,9 +30,7 @@ class RegisterView(View):
             'message': 'User created successfully',
             'user_id': user.id
         }, status=201)
-
-
-
+@method_decorator(csrf_exempt, name='dispatch')
 class LoginView(View):
     def post(self, request):
         data = json.loads(request.body)
@@ -48,7 +48,7 @@ class LoginView(View):
         return JsonResponse({
             'message': 'Login successful'
         })
-
+@method_decorator(csrf_exempt, name='dispatch')
 class AddIncomeView(View):
     def post(self, request):
         if not request.user.is_authenticated:
@@ -72,7 +72,7 @@ class AddIncomeView(View):
         
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)  
-        
+@method_decorator(csrf_exempt, name='dispatch')       
 class AddExpenseView(View):
     def post(self, request):
         if not request.user.is_authenticated:
@@ -100,3 +100,26 @@ class AddExpenseView(View):
             return JsonResponse({'error': str(e)}, status=400)
         except Exception as e:
             return JsonResponse({'error': 'An error occurred'}, status=500)
+@method_decorator(csrf_exempt, name='dispatch')
+class MonthlyReportView(View):
+    def get(self, request):
+        if not request.user.is_authenticated:
+            return JsonResponse({'error': 'Login required'}, status=401)
+
+        month = request.GET.get('month')  # format: YYYY-MM
+
+        if not month:
+            return JsonResponse({'error': 'Month is required'}, status=400)
+
+        manager = TransactionManager()
+
+        try:
+            report = manager.generate_report(request.user, month)
+
+            return JsonResponse({
+                'message': 'Report ready',
+                'data': report
+            }, status=200)
+
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)

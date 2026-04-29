@@ -2,13 +2,14 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth import authenticate, login
 from .models import Income, Expense, Category
 from django.db.models import Sum
+from datetime import datetime
 
 
 User = get_user_model()
 
 
 class AuthManager ():
-    def register(username, email, password):
+    def register(self,username, email, password):
         if not username or not password:
             raise ValueError("Missing fields")
         
@@ -21,7 +22,7 @@ class AuthManager ():
         user = self.validateCredentials(request, username, password)
         login(request, user)
         
-    def validateCredentials(request, username, password):
+    def validateCredentials(self,request, username, password):
         user = authenticate(request, username=username, password=password)
         if user is None:
             raise ValueError("Invalid credentials")
@@ -69,3 +70,52 @@ class TransactionManager:
         updated_balance = self.calculateBalance(user)
         
         return expense, updated_balance
+
+    def filter_by_date(self, user, start_date, end_date):
+        incomes = Income.objects.filter(
+        user=user,
+        date__range=(start_date, end_date)
+    )
+        expenses = Expense.objects.filter(
+        user=user,
+        date__range=(start_date, end_date)
+    )
+        return incomes, expenses
+
+    def generate_pie_chart(self, expenses):
+        return expenses.values('category__name').annotate(
+            total=Sum('amount')
+        )
+
+    def generate_bar_chart(self, total_income, total_expense):
+        return {
+            "income": total_income,
+            "expense": total_expense
+        }
+
+    def generate_report(self, user, month):
+        # month format: "2026-01"
+        start_date = datetime.strptime(month, "%Y-%m")
+
+        if start_date.month == 12:
+            end_date = start_date.replace(year=start_date.year + 1, month=1)
+        else:
+            end_date = start_date.replace(month=start_date.month + 1)
+
+        incomes, expenses = self.filter_by_date(user, start_date, end_date)
+
+        total_income = incomes.aggregate(total=Sum('amount'))['total'] or 0
+        total_expense = expenses.aggregate(total=Sum('amount'))['total'] or 0
+
+        pie_chart = self.generate_pie_chart(expenses)
+        bar_chart = self.generate_bar_chart(total_income, total_expense)
+
+        return {
+            "status": "report_ready",
+            "month": month,
+            "total_income": total_income,
+            "total_expense": total_expense,
+            "net_balance": total_income - total_expense,
+            "pie_chart": list(pie_chart),
+            "bar_chart": bar_chart
+        }
