@@ -3,8 +3,7 @@ import json
 from django.http import JsonResponse
 from django.views import View
 from django.contrib.auth import get_user_model
-from .services import AuthManager
-from .services import TransactionManager
+from .services import AuthManager, TransactionManager, BudgetManager
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 User = get_user_model()
@@ -100,6 +99,42 @@ class AddExpenseView(View):
             return JsonResponse({'error': str(e)}, status=400)
         except Exception as e:
             return JsonResponse({'error': 'An error occurred'}, status=500)
+
+@method_decorator(csrf_exempt, name='dispatch')
+class SetBudgetView(View):
+    def post(self, request):
+        if not request.user.is_authenticated:
+            return JsonResponse({'error': 'Login required'}, status=401)
+        data = json.loads(request.body)
+        manager = BudgetManager()
+        try:
+            manager.setBudget(
+                user=request.user,
+                amount=data.get('amount'),
+                category_name=data.get('category_name'),
+                start=data.get('start'),
+                end=data.get('end')
+            )
+            return JsonResponse({'message': 'Budget set successfully'}, status=201)
+        except Exception as e:
+            return JsonResponse({'error': 'An error occurred'}, status=500)
+
+@method_decorator(csrf_exempt, name='dispatch')
+class ViewBalanceView(View):
+    def get(self, request):
+        if not request.user.is_authenticated:
+            return JsonResponse({'error': 'Login required'}, status=401)
+        category_name = request.GET.get('category')
+        user = request.user
+        manager = BudgetManager()
+        try:
+            remaining = manager.calculateRemaining(user=user, category_name=category_name)
+            return JsonResponse({'remaining': remaining}, status=200)
+        except Exception as e:
+            return JsonResponse({'error': 'An error occurred'}, status=500)
+
+
+
 @method_decorator(csrf_exempt, name='dispatch')
 class MonthlyReportView(View):
     def get(self, request):

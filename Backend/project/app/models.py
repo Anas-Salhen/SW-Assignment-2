@@ -4,6 +4,7 @@ from django.contrib.auth.models import AbstractUser
 class User(AbstractUser):
     pass
 class Category(models.Model):
+    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
     isCustom = models.BooleanField(default=False)
 
@@ -24,3 +25,10 @@ class Income(Transaction):
 
 class Expense(Transaction):
     paymentMethod = models.CharField(max_length=100)
+
+class Budget(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    amount = models.DecimalField()
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    start_date = models.DateField()
+    end_date = models.DateField()

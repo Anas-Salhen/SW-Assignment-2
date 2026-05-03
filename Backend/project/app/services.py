@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth import authenticate, login
-from .models import Income, Expense, Category
+from .models import Income, Expense, Category, Budget
 from django.db.models import Sum
 from datetime import datetime
 
@@ -119,3 +119,14 @@ class TransactionManager:
             "pie_chart": list(pie_chart),
             "bar_chart": bar_chart
         }
+
+class BudgetManager:
+    def setBudget(user, amount, category_name, start, end):
+        category_id = Category.objects.filter(name=category_name).id
+        Budget.objects.update_or_create(user=user, category=category_id, amount=amount, start_date=start, end_date=end)
+
+    def calculateRemaining(category_name, user):
+        category_id = Category.objects.filter(name=category_name).id
+        total_expense = Expense.objects.filter(user=user, category=category_id).aggregate(Sum('amount'))['amount__sum'] or 0
+        limit = Budget.objects.filter(user=user, category=category_id).amount
+        return limit - total_expense
