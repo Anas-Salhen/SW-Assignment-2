@@ -1,4 +1,5 @@
-from django.shortcuts import render
+
+from django.shortcuts import render, redirect
 import json
 from django.http import JsonResponse
 from django.views import View
@@ -6,7 +7,38 @@ from django.contrib.auth import get_user_model
 from .services import AuthManager, TransactionManager, BudgetManager
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
+from .models import Transaction
+from django.db.models import Sum
+
 User = get_user_model()
+
+def index_view(request):
+
+    total_income = Transaction.objects.filter(transaction_type='income').aggregate(Sum('amount'))['amount__sum'] or 0
+    total_expense = Transaction.objects.filter(transaction_type='expense').aggregate(Sum('amount'))['amount__sum'] or 0
+    balance = total_income - total_expense
+
+    context = {
+        'total_income': total_income,
+        'total_expense': total_expense,
+        'balance': balance,
+        'transactions': Transaction.objects.all().order_by('-id')[:5]
+    }
+    return render(request, 'Budgeteer/index.html', context)
+
+def add_transaction_view(request):
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        amount = request.POST.get('amount')
+        t_type = request.POST.get('type') 
+        
+        Transaction.objects.create(
+            title=title,
+            amount=amount,
+            transaction_type=t_type
+        )
+        return redirect('home')
+    return render(request, 'Budgeteer/add_transaction.html')
 
 @method_decorator(csrf_exempt, name='dispatch')
 class RegisterView(View):

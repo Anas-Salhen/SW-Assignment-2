@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مدير الميزانية</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <style>body { font-family: 'Cairo', sans-serif; }</style>
+</head>
+<body class="bg-gray-50">
+    <nav class="bg-indigo-700 text-white shadow-lg p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <a href="/api/home/" class="text-2xl font-bold">حساباتي 💸</a>
+            <div class="space-x-reverse space-x-4">
+                <a href="/api/home/" class="hover:text-indigo-200">الرئيسية</a>
+                <a href="/api/add/" class="bg-white text-indigo-700 px-4 py-2 rounded-lg font-bold hover:bg-indigo-50">إضافة عملية</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto mt-10 px-4">
+        {% block content %}
+        {% endblock %}
+    </div>
+</body>
+</html>

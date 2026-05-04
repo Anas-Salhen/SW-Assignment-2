@@ -1,0 +1,20 @@
+{% extends 'Budgeteer/base.html' %}
+
+{% block content %}
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="bg-white p-6 rounded-2xl shadow-sm border-r-8 border-green-500">
+        <p class="text-gray-500 font-semibold">إجمالي الدخل</p>
+        <h3 class="text-3xl font-bold text-green-600 mt-2">{{ total_income }} ج.م</h3>
+    </div>
+
+    <div class="bg-white p-6 rounded-2xl shadow-sm border-r-8 border-red-500">
+        <p class="text-gray-500 font-semibold">إجمالي المصاريف</p>
+        <h3 class="text-3xl font-bold text-red-600 mt-2">{{ total_expense }} ج.م</h3>
+    </div>
+
+    <div class="bg-white p-6 rounded-2xl shadow-sm border-r-8 border-indigo-600">
+        <p class="text-gray-500 font-semibold">الرصيد المتبقي</p>
+        <h3 class="text-3xl font-bold text-indigo-700 mt-2">{{ balance }} ج.م</h3>
+    </div>
+</div>
+{% endblock %}

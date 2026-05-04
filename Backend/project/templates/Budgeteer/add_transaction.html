@@ -1,0 +1,43 @@
+{% extends 'Budgeteer/base.html' %}
+
+{% block content %}
+<div class="max-w-xl mx-auto bg-white p-8 rounded-2xl shadow-lg border border-gray-100">
+    <div class="flex items-center justify-center mb-6">
+        <span class="text-4xl">📝</span>
+        <h2 class="text-2xl font-bold text-gray-800 mr-2">تسجيل عملية جديدة</h2>
+    </div>
+
+    <form method="POST">
+        {% csrf_token %}
+        
+        <div class="mb-5">
+            <label class="block text-gray-700 font-bold mb-2">وصف العملية</label>
+            <input type="text" name="title" placeholder="مثلاً: مرتب شهر مايو، فاتورة الكهرباء" 
+                   class="w-full border-2 border-gray-200 p-3 rounded-xl focus:border-indigo-500 outline-none transition">
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 mb-5">
+            <div>
+                <label class="block text-gray-700 font-bold mb-2">المبلغ</label>
+                <input type="number" name="amount" placeholder="0.00" 
+                       class="w-full border-2 border-gray-200 p-3 rounded-xl focus:border-indigo-500 outline-none transition">
+            </div>
+            <div>
+                <label class="block text-gray-700 font-bold mb-2">نوع العملية</label>
+                <select name="type" class="w-full border-2 border-gray-200 p-3 rounded-xl focus:border-indigo-500 outline-none transition">
+                    <option value="income" class="text-green-600 font-bold">دخل (+)</option>
+                    <option value="expense" class="text-red-600 font-bold">مصروف (-)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="mb-8 text-sm text-gray-500">
+            * سيتم إضافة المبلغ تلقائياً لرصيدك في حالة "الدخل" وخصمه في حالة "المصروف".
+        </div>
+
+        <button type="submit" class="w-full bg-indigo-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-indigo-700 shadow-md transition transform active:scale-95">
+            حفظ العملية
+        </button>
+    </form>
+</div>
+{% endblock %}
