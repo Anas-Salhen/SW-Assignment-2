@@ -1,43 +1,70 @@
 {% extends 'Budgeteer/base.html' %}
 
 {% block content %}
-<div class="max-w-xl mx-auto bg-white p-8 rounded-2xl shadow-lg border border-gray-100">
-    <div class="flex items-center justify-center mb-6">
-        <span class="text-4xl">📝</span>
-        <h2 class="text-2xl font-bold text-gray-800 mr-2">تسجيل عملية جديدة</h2>
+
+<div class="max-w-lg mx-auto fade-up">
+
+    <!-- Header -->
+    <div class="text-center mb-8">
+        <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4" style="background: linear-gradient(135deg, rgba(167,139,250,0.2), rgba(96,165,250,0.2)); border: 1px solid rgba(167,139,250,0.3);">
+            📝
+        </div>
+        <h2 class="text-3xl font-extrabold text-white">New Transaction</h2>
+        <p class="text-white/40 mt-1">Record your income or expense</p>
     </div>
 
-    <form method="POST">
-        {% csrf_token %}
-        
-        <div class="mb-5">
-            <label class="block text-gray-700 font-bold mb-2">وصف العملية</label>
-            <input type="text" name="title" placeholder="مثلاً: مرتب شهر مايو، فاتورة الكهرباء" 
-                   class="w-full border-2 border-gray-200 p-3 rounded-xl focus:border-indigo-500 outline-none transition">
-        </div>
+    <!-- Form Card -->
+    <div class="glass-card rounded-2xl p-8">
+        <form method="POST">
+            {% csrf_token %}
 
-        <div class="grid grid-cols-2 gap-4 mb-5">
-            <div>
-                <label class="block text-gray-700 font-bold mb-2">المبلغ</label>
-                <input type="number" name="amount" placeholder="0.00" 
-                       class="w-full border-2 border-gray-200 p-3 rounded-xl focus:border-indigo-500 outline-none transition">
+            <!-- Description -->
+            <div class="mb-6">
+                <label class="block text-white/70 text-sm font-semibold mb-2 uppercase tracking-wider">Description</label>
+                <input type="text" name="title"
+                       placeholder="e.g. May Salary, Electricity Bill"
+                       class="w-full rounded-xl px-4 py-3 text-white placeholder-white/25 font-medium outline-none transition focus:ring-2 focus:ring-violet-500/50"
+                       style="background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);">
             </div>
-            <div>
-                <label class="block text-gray-700 font-bold mb-2">نوع العملية</label>
-                <select name="type" class="w-full border-2 border-gray-200 p-3 rounded-xl focus:border-indigo-500 outline-none transition">
-                    <option value="income" class="text-green-600 font-bold">دخل (+)</option>
-                    <option value="expense" class="text-red-600 font-bold">مصروف (-)</option>
-                </select>
+
+            <!-- Amount + Type -->
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <div>
+                    <label class="block text-white/70 text-sm font-semibold mb-2 uppercase tracking-wider">Amount</label>
+                    <input type="number" name="amount" placeholder="0.00"
+                           class="w-full rounded-xl px-4 py-3 text-white placeholder-white/25 font-medium outline-none transition focus:ring-2 focus:ring-violet-500/50"
+                           style="background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);">
+                </div>
+                <div>
+                    <label class="block text-white/70 text-sm font-semibold mb-2 uppercase tracking-wider">Type</label>
+                    <select name="type"
+                            class="w-full rounded-xl px-4 py-3 text-white font-medium outline-none transition focus:ring-2 focus:ring-violet-500/50 cursor-pointer"
+                            style="background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);">
+                        <option value="income" style="background: #302b63;">💚 Income</option>
+                        <option value="expense" style="background: #302b63;">❤️ Expense</option>
+                    </select>
+                </div>
             </div>
-        </div>
 
-        <div class="mb-8 text-sm text-gray-500">
-            * سيتم إضافة المبلغ تلقائياً لرصيدك في حالة "الدخل" وخصمه في حالة "المصروف".
-        </div>
+            <!-- Note -->
+            <div class="mb-8 flex items-start gap-2 rounded-xl px-4 py-3" style="background: rgba(167,139,250,0.08); border: 1px solid rgba(167,139,250,0.2);">
+                <span class="text-violet-400 mt-0.5">ℹ️</span>
+                <p class="text-white/40 text-sm">Income will be added to your balance. Expenses will be deducted automatically.</p>
+            </div>
 
-        <button type="submit" class="w-full bg-indigo-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-indigo-700 shadow-md transition transform active:scale-95">
-            حفظ العملية
-        </button>
-    </form>
+            <!-- Submit -->
+            <button type="submit" class="btn-primary w-full py-4 text-base font-bold rounded-xl text-center">
+                Save Transaction
+            </button>
+
+        </form>
+    </div>
+
+    <!-- Back link -->
+    <div class="text-center mt-6">
+        <a href="/api/home/" class="text-white/30 hover:text-white/60 text-sm transition">← Back to Dashboard</a>
+    </div>
+
 </div>
+
 {% endblock %}

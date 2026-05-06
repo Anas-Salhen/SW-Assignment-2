@@ -1,0 +1,61 @@
+{% extends 'Budgeteer/base.html' %}
+
+{% block content %}
+
+<div class="max-w-md mx-auto fade-up">
+
+    <!-- Header -->
+    <div class="text-center mb-8">
+        <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4" style="background: linear-gradient(135deg, rgba(167,139,250,0.2), rgba(96,165,250,0.2)); border: 1px solid rgba(167,139,250,0.3);">
+            🔐
+        </div>
+        <h2 class="text-3xl font-extrabold text-white">Welcome Back</h2>
+        <p class="text-white/40 mt-1">Login to manage your budget</p>
+    </div>
+
+    <!-- Error Message -->
+    {% if error %}
+    <div class="mb-6 rounded-xl px-4 py-3 flex items-center gap-2 fade-up" style="background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.3);">
+        <span>⚠️</span>
+        <p class="text-red-400 text-sm font-medium">{{ error }}</p>
+    </div>
+    {% endif %}
+
+    <!-- Form Card -->
+    <div class="glass-card rounded-2xl p-8">
+        <form method="POST" action="/api/login-view/">
+            {% csrf_token %}
+
+            <!-- Username -->
+            <div class="mb-6">
+                <label class="block text-white/70 text-sm font-semibold mb-2 uppercase tracking-wider">Username</label>
+                <input type="text" name="username" placeholder="Enter your username"
+                       class="w-full rounded-xl px-4 py-3 text-white placeholder-white/25 font-medium outline-none transition focus:ring-2 focus:ring-violet-500/50"
+                       style="background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);">
+            </div>
+
+            <!-- Password -->
+            <div class="mb-8">
+                <label class="block text-white/70 text-sm font-semibold mb-2 uppercase tracking-wider">Password</label>
+                <input type="password" name="password" placeholder="Enter your password"
+                       class="w-full rounded-xl px-4 py-3 text-white placeholder-white/25 font-medium outline-none transition focus:ring-2 focus:ring-violet-500/50"
+                       style="background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);">
+            </div>
+
+            <!-- Submit -->
+            <button type="submit" class="btn-primary w-full py-4 text-base font-bold rounded-xl text-center">
+                Login
+            </button>
+        </form>
+    </div>
+
+    <!-- Register Link -->
+    <div class="text-center mt-6">
+        <p class="text-white/30 text-sm">Don't have an account?
+            <a href="/api/register-view/" class="text-violet-400 hover:text-violet-300 font-semibold transition">Register here</a>
+        </p>
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,20 +1,97 @@
 {% extends 'Budgeteer/base.html' %}
 
 {% block content %}
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-    <div class="bg-white p-6 rounded-2xl shadow-sm border-r-8 border-green-500">
-        <p class="text-gray-500 font-semibold">إجمالي الدخل</p>
-        <h3 class="text-3xl font-bold text-green-600 mt-2">{{ total_income }} ج.م</h3>
+
+<!-- Page Header -->
+<div class="mb-10 fade-up">
+    <h1 class="text-4xl font-extrabold text-white mb-1">My Dashboard</h1>
+    <p class="text-white/50">Track your income, expenses, and balance at a glance.</p>
+</div>
+
+<!-- Stats Cards -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+
+    <!-- Income -->
+    <div class="glass-card rounded-2xl p-6 fade-up">
+        <div class="flex items-center justify-between mb-4">
+            <span class="text-white/50 font-medium text-sm uppercase tracking-widest">Total Income</span>
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center text-lg" style="background: rgba(52,211,153,0.15);">
+                💰
+            </div>
+        </div>
+        <h3 class="text-4xl font-bold text-emerald-400">{{ total_income }} <span class="text-xl font-normal text-white/40">EGP</span></h3>
+        <div class="mt-3 h-1 rounded-full" style="background: linear-gradient(90deg, #34d399, transparent);"></div>
     </div>
 
-    <div class="bg-white p-6 rounded-2xl shadow-sm border-r-8 border-red-500">
-        <p class="text-gray-500 font-semibold">إجمالي المصاريف</p>
-        <h3 class="text-3xl font-bold text-red-600 mt-2">{{ total_expense }} ج.م</h3>
+    <!-- Expenses -->
+    <div class="glass-card rounded-2xl p-6 fade-up-2">
+        <div class="flex items-center justify-between mb-4">
+            <span class="text-white/50 font-medium text-sm uppercase tracking-widest">Total Expenses</span>
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center text-lg" style="background: rgba(248,113,113,0.15);">
+                💸
+            </div>
+        </div>
+        <h3 class="text-4xl font-bold text-red-400">{{ total_expense }} <span class="text-xl font-normal text-white/40">EGP</span></h3>
+        <div class="mt-3 h-1 rounded-full" style="background: linear-gradient(90deg, #f87171, transparent);"></div>
     </div>
 
-    <div class="bg-white p-6 rounded-2xl shadow-sm border-r-8 border-indigo-600">
-        <p class="text-gray-500 font-semibold">الرصيد المتبقي</p>
-        <h3 class="text-3xl font-bold text-indigo-700 mt-2">{{ balance }} ج.م</h3>
+    <!-- Balance -->
+    <div class="glass-card rounded-2xl p-6 fade-up-3">
+        <div class="flex items-center justify-between mb-4">
+            <span class="text-white/50 font-medium text-sm uppercase tracking-widest">Net Balance</span>
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center text-lg" style="background: rgba(167,139,250,0.15);">
+                📊
+            </div>
+        </div>
+        <h3 class="text-4xl font-bold text-violet-400">{{ balance }} <span class="text-xl font-normal text-white/40">EGP</span></h3>
+        <div class="mt-3 h-1 rounded-full" style="background: linear-gradient(90deg, #a78bfa, transparent);"></div>
+    </div>
+
+</div>
+
+<!-- Recent Transactions -->
+<div class="fade-up-2">
+    <div class="flex items-center justify-between mb-5">
+        <h2 class="text-xl font-bold text-white">Recent Transactions</h2>
+        <a href="/api/add/" class="text-violet-400 hover:text-violet-300 text-sm font-medium transition">+ Add New</a>
+    </div>
+
+    <div class="glass-card rounded-2xl overflow-hidden">
+        {% if transactions %}
+            <table class="w-full">
+                <thead>
+                    <tr class="border-b border-white/10">
+                        <th class="text-left text-white/40 text-xs uppercase tracking-widest px-6 py-4 font-medium">Description</th>
+                        <th class="text-left text-white/40 text-xs uppercase tracking-widest px-6 py-4 font-medium">Type</th>
+                        <th class="text-right text-white/40 text-xs uppercase tracking-widest px-6 py-4 font-medium">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for t in transactions %}
+                    <tr class="border-b border-white/5 hover:bg-white/5 transition">
+                        <td class="px-6 py-4 text-white font-medium">{{ t.title }}</td>
+                        <td class="px-6 py-4">
+                            {% if t.transaction_type == 'income' %}
+                                <span class="px-3 py-1 rounded-full text-xs font-semibold" style="background: rgba(52,211,153,0.15); color: #34d399;">Income</span>
+                            {% else %}
+                                <span class="px-3 py-1 rounded-full text-xs font-semibold" style="background: rgba(248,113,113,0.15); color: #f87171;">Expense</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 text-right font-bold {% if t.transaction_type == 'income' %}text-emerald-400{% else %}text-red-400{% endif %}">
+                            {% if t.transaction_type == 'income' %}+{% else %}-{% endif %}{{ t.amount }} EGP
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div class="flex flex-col items-center justify-center py-16 text-white/30">
+                <span class="text-5xl mb-4">🪙</span>
+                <p class="font-medium">No transactions yet</p>
+                <a href="/api/add/" class="mt-4 text-violet-400 hover:text-violet-300 text-sm transition">Add your first one →</a>
+            </div>
+        {% endif %}
     </div>
 </div>
+
 {% endblock %}

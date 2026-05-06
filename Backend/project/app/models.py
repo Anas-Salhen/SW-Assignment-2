@@ -34,6 +34,7 @@ class Income(Transaction):
 
 class Expense(Transaction):
     paymentMethod = models.CharField(max_length=100)
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True)
 
 class Budget(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
