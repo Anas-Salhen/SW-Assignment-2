@@ -66,7 +66,6 @@
             box-shadow: 0 8px 30px rgba(167, 139, 250, 0.5);
         }
 
-        /* Orb background effects */
         .orb {
             position: fixed;
             border-radius: 50%;
@@ -76,65 +75,46 @@
             z-index: 0;
         }
 
-        .orb-1 {
-            width: 500px; height: 500px;
-            background: #a78bfa;
-            top: -100px; left: -100px;
-        }
-
-        .orb-2 {
-            width: 400px; height: 400px;
-            background: #60a5fa;
-            bottom: -50px; right: -50px;
-        }
-
-        .orb-3 {
-            width: 300px; height: 300px;
-            background: #34d399;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-        }
+        .orb-1 { width: 500px; height: 500px; background: #a78bfa; top: -100px; left: -100px; }
+        .orb-2 { width: 400px; height: 400px; background: #60a5fa; bottom: -50px; right: -50px; }
+        .orb-3 { width: 300px; height: 300px; background: #34d399; top: 50%; left: 50%; transform: translate(-50%, -50%); }
 
         main { position: relative; z-index: 1; }
-        nav { position: relative; z-index: 2; }
+        nav  { position: relative; z-index: 2; }
 
         @keyframes fadeUp {
             from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            to   { opacity: 1; transform: translateY(0); }
         }
-        .fade-up { animation: fadeUp 0.6s ease forwards; }
+        .fade-up   { animation: fadeUp 0.6s ease forwards; }
         .fade-up-2 { animation: fadeUp 0.6s ease 0.1s forwards; opacity: 0; }
         .fade-up-3 { animation: fadeUp 0.6s ease 0.2s forwards; opacity: 0; }
     </style>
 </head>
 <body>
-    <!-- Background orbs -->
     <div class="orb orb-1"></div>
     <div class="orb orb-2"></div>
     <div class="orb orb-3"></div>
 
-    <!-- Navbar -->
-     
     <nav class="glass border-b border-white/10 px-6 py-4">
         <div class="container mx-auto flex justify-between items-center">
-            <a href="/api/home/" class="brand text-2xl font-extrabold gradient-text">
+            <a href="/home/" class="brand text-2xl font-extrabold gradient-text">
                 Budgeteer 💸
             </a>
             <div class="flex items-center gap-6">
-            <a href="/api/home/" class="nav-link">Dashboard</a>
-            <a href="/api/set-budget-view/" class="nav-link">Set Budget</a>
-            <a href="/api/view-balance-view/" class="nav-link">Balance</a>
-            <a href="/api/report-view/" class="nav-link">Report</a>
-            <a href="/api/add/" class="btn-primary">+ Add Transaction</a>
-            <a href="/api/logout/" class="nav-link text-red-400">Logout</a>
+                <a href="/home/"              class="nav-link">Dashboard</a>
+                <a href="/set-budget-view/"   class="nav-link">Set Budget</a>
+                <a href="/view-balance-view/" class="nav-link">Balance</a>
+                <a href="/goals-view/"         class="nav-link">Goals </a>
+                <a href="/report-view/"        class="nav-link">Report</a>
+                <a href="/add/"                class="btn-primary">+ Add Transaction</a>
+                <a href="/logout/"             class="nav-link text-red-400">Logout</a>
             </div>
         </div>
     </nav>
 
-    <!-- Main content -->
     <main class="container mx-auto mt-10 px-4 pb-16">
-        {% block content %}
-        {% endblock %}
+        {% block content %}{% endblock %}
     </main>
 </body>
 </html>

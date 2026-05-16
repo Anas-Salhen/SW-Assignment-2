@@ -4,67 +4,138 @@
 
 <div class="max-w-lg mx-auto fade-up">
 
-    <!-- Header -->
     <div class="text-center mb-8">
-        <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4" style="background: linear-gradient(135deg, rgba(167,139,250,0.2), rgba(96,165,250,0.2)); border: 1px solid rgba(167,139,250,0.3);">
+        <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4"
+             style="background: linear-gradient(135deg, rgba(167,139,250,0.2), rgba(96,165,250,0.2)); border: 1px solid rgba(167,139,250,0.3);">
             📝
         </div>
         <h2 class="text-3xl font-extrabold text-white">New Transaction</h2>
         <p class="text-white/40 mt-1">Record your income or expense</p>
     </div>
 
-    <!-- Form Card -->
+    {% if error %}
+    <div class="mb-6 rounded-xl px-4 py-3 flex items-center gap-2"
+         style="background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.3);">
+        <span>⚠️</span>
+        <p class="text-red-400 text-sm font-medium">{{ error }}</p>
+    </div>
+    {% endif %}
+
+    {% if success %}
+    <div class="mb-6 rounded-xl px-4 py-3 flex items-center gap-2"
+         style="background: rgba(52,211,153,0.1); border: 1px solid rgba(52,211,153,0.3);">
+        <span>✅</span>
+        <p class="text-emerald-400 text-sm font-medium">{{ success }}</p>
+    </div>
+    {% endif %}
+
     <div class="glass-card rounded-2xl p-8">
-        <form method="POST">
+        <form method="POST" action="/add/" id="txForm">
             {% csrf_token %}
 
-            <!-- Description -->
+            <div class="mb-6">
+                <label class="block text-white/70 text-sm font-semibold mb-2 uppercase tracking-wider">Transaction Type</label>
+                <div class="grid grid-cols-2 gap-3">
+                    <label class="type-btn cursor-pointer" for="typeIncome">
+                        <input type="radio" name="type" id="typeIncome" value="income" class="hidden" checked>
+                        <div class="type-label rounded-xl px-4 py-3 text-center font-semibold text-sm transition border"
+                             style="background: rgba(52,211,153,0.15); border-color: rgba(52,211,153,0.5); color: #34d399;">
+                             Income
+                        </div>
+                    </label>
+                    <label class="type-btn cursor-pointer" for="typeExpense">
+                        <input type="radio" name="type" id="typeExpense" value="expense" class="hidden">
+                        <div class="type-label rounded-xl px-4 py-3 text-center font-semibold text-sm transition border"
+                             style="background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.12); color: rgba(255,255,255,0.4);">
+                             Expense
+                        </div>
+                    </label>
+                </div>
+            </div>
+
             <div class="mb-6">
                 <label class="block text-white/70 text-sm font-semibold mb-2 uppercase tracking-wider">Description</label>
-                <input type="text" name="title"
-                       placeholder="e.g. May Salary, Electricity Bill"
+                <input type="text" name="title" placeholder="e.g. May Salary, Electricity Bill"
                        class="w-full rounded-xl px-4 py-3 text-white placeholder-white/25 font-medium outline-none transition focus:ring-2 focus:ring-violet-500/50"
                        style="background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);">
             </div>
 
-            <!-- Amount + Type -->
-            <div class="grid grid-cols-2 gap-4 mb-6">
-                <div>
-                    <label class="block text-white/70 text-sm font-semibold mb-2 uppercase tracking-wider">Amount</label>
-                    <input type="number" name="amount" placeholder="0.00"
+            <div class="mb-6">
+                <label class="block text-white/70 text-sm font-semibold mb-2 uppercase tracking-wider">Amount (EGP)</label>
+                <input type="number" name="amount" placeholder="0.00" min="0.01" step="0.01"
+                       class="w-full rounded-xl px-4 py-3 text-white placeholder-white/25 font-medium outline-none transition focus:ring-2 focus:ring-violet-500/50"
+                       style="background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);">
+            </div>
+
+            <div id="incomeFields">
+                <div class="mb-6">
+                    <label class="block text-white/70 text-sm font-semibold mb-2 uppercase tracking-wider">Source</label>
+                    <input type="text" name="source" placeholder="e.g. Salary, Freelance, Gift"
                            class="w-full rounded-xl px-4 py-3 text-white placeholder-white/25 font-medium outline-none transition focus:ring-2 focus:ring-violet-500/50"
                            style="background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);">
                 </div>
-                <div>
-                    <label class="block text-white/70 text-sm font-semibold mb-2 uppercase tracking-wider">Type</label>
-                    <select name="type"
+            </div>
+
+            <div id="expenseFields" class="hidden">
+                <div class="mb-6">
+                    <label class="block text-white/70 text-sm font-semibold mb-2 uppercase tracking-wider">Category</label>
+                    <input type="text" name="category" placeholder="e.g. Food, Transport, Rent"
+                           class="w-full rounded-xl px-4 py-3 text-white placeholder-white/25 font-medium outline-none transition focus:ring-2 focus:ring-violet-500/50"
+                           style="background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);">
+                </div>
+                <div class="mb-6">
+                    <label class="block text-white/70 text-sm font-semibold mb-2 uppercase tracking-wider">Payment Method</label>
+                    <select name="paymentMethod"
                             class="w-full rounded-xl px-4 py-3 text-white font-medium outline-none transition focus:ring-2 focus:ring-violet-500/50 cursor-pointer"
                             style="background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);">
-                        <option value="income" style="background: #302b63;">💚 Income</option>
-                        <option value="expense" style="background: #302b63;">❤️ Expense</option>
+                        <option value="Cash"          style="background: #302b63;"> Cash</option>
+                        <option value="Credit Card"   style="background: #302b63;"> Credit Card</option>
+                        <option value="Debit Card"    style="background: #302b63;"> Debit Card</option>
+                        <option value="Bank Transfer" style="background: #302b63;"> Bank Transfer</option>
+                        <option value="E-Wallet"      style="background: #302b63;"> E-Wallet</option>
                     </select>
                 </div>
             </div>
 
-            <!-- Note -->
-            <div class="mb-8 flex items-start gap-2 rounded-xl px-4 py-3" style="background: rgba(167,139,250,0.08); border: 1px solid rgba(167,139,250,0.2);">
-                <span class="text-violet-400 mt-0.5">ℹ️</span>
-                <p class="text-white/40 text-sm">Income will be added to your balance. Expenses will be deducted automatically.</p>
-            </div>
-
-            <!-- Submit -->
             <button type="submit" class="btn-primary w-full py-4 text-base font-bold rounded-xl text-center">
                 Save Transaction
             </button>
-
         </form>
     </div>
 
-    <!-- Back link -->
     <div class="text-center mt-6">
-        <a href="/api/home/" class="text-white/30 hover:text-white/60 text-sm transition">← Back to Dashboard</a>
+        <a href="/home/" class="text-white/30 hover:text-white/60 text-sm transition"> Back to Dashboard</a>
     </div>
 
 </div>
+
+<script>
+    const incomeRadio  = document.getElementById('typeIncome');
+    const expenseRadio = document.getElementById('typeExpense');
+    const incomeFields  = document.getElementById('incomeFields');
+    const expenseFields = document.getElementById('expenseFields');
+
+    const incomeStyle  = 'background: rgba(52,211,153,0.15); border-color: rgba(52,211,153,0.5); color: #34d399;';
+    const expenseStyle = 'background: rgba(248,113,113,0.15); border-color: rgba(248,113,113,0.5); color: #f87171;';
+    const inactiveStyle = 'background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.12); color: rgba(255,255,255,0.4);';
+
+    function updateUI() {
+        if (incomeRadio.checked) {
+            incomeFields.classList.remove('hidden');
+            expenseFields.classList.add('hidden');
+            incomeRadio.nextElementSibling.style.cssText  = incomeStyle;
+            expenseRadio.nextElementSibling.style.cssText = inactiveStyle;
+        } else {
+            incomeFields.classList.add('hidden');
+            expenseFields.classList.remove('hidden');
+            expenseRadio.nextElementSibling.style.cssText = expenseStyle;
+            incomeRadio.nextElementSibling.style.cssText  = inactiveStyle;
+        }
+    }
+
+    incomeRadio.addEventListener('change', updateUI);
+    expenseRadio.addEventListener('change', updateUI);
+    updateUI();
+</script>
 
 {% endblock %}

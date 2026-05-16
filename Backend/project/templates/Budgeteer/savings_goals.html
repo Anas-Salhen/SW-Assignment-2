@@ -1,0 +1,146 @@
+{% extends 'Budgeteer/base.html' %}
+
+{% block content %}
+
+<div class="mb-10 fade-up">
+    <h1 class="text-4xl font-extrabold text-white mb-1">Savings Goals 🎯</h1>
+    <p class="text-white/50">Set targets and track your progress toward financial goals.</p>
+</div>
+
+<!-- Create New Goal -->
+<div class="glass-card rounded-2xl p-8 mb-10 fade-up">
+    <h2 class="text-xl font-bold text-white mb-6">Create New Goal</h2>
+
+    {% if error %}
+    <div class="mb-6 rounded-xl px-4 py-3 flex items-center gap-2"
+         style="background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.3);">
+        <span>⚠️</span>
+        <p class="text-red-400 text-sm font-medium">{{ error }}</p>
+    </div>
+    {% endif %}
+
+    {% if success %}
+    <div class="mb-6 rounded-xl px-4 py-3 flex items-center gap-2"
+         style="background: rgba(52,211,153,0.1); border: 1px solid rgba(52,211,153,0.3);">
+        <span>✅</span>
+        <p class="text-emerald-400 text-sm font-medium">{{ success }}</p>
+    </div>
+    {% endif %}
+
+    <form method="POST" action="/api/goals-view/">
+        {% csrf_token %}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <!-- Goal Name -->
+            <div>
+                <label class="block text-white/70 text-sm font-semibold mb-2 uppercase tracking-wider">Goal Name</label>
+                <input type="text" name="name" placeholder="e.g. Emergency Fund, New Laptop"
+                       class="w-full rounded-xl px-4 py-3 text-white placeholder-white/25 font-medium outline-none transition focus:ring-2 focus:ring-violet-500/50"
+                       style="background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);">
+            </div>
+            <!-- Target Amount -->
+            <div>
+                <label class="block text-white/70 text-sm font-semibold mb-2 uppercase tracking-wider">Target Amount (EGP)</label>
+                <input type="number" name="targetAmount" placeholder="0.00" min="1" step="0.01"
+                       class="w-full rounded-xl px-4 py-3 text-white placeholder-white/25 font-medium outline-none transition focus:ring-2 focus:ring-violet-500/50"
+                       style="background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);">
+            </div>
+            <!-- Current Amount Saved -->
+            <div>
+                <label class="block text-white/70 text-sm font-semibold mb-2 uppercase tracking-wider">Amount Already Saved (EGP)</label>
+                <input type="number" name="currentAmount" placeholder="0.00" min="0" step="0.01" value="0"
+                       class="w-full rounded-xl px-4 py-3 text-white placeholder-white/25 font-medium outline-none transition focus:ring-2 focus:ring-violet-500/50"
+                       style="background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);">
+            </div>
+            <!-- Deadline -->
+            <div>
+                <label class="block text-white/70 text-sm font-semibold mb-2 uppercase tracking-wider">Deadline</label>
+                <input type="date" name="deadline"
+                       class="w-full rounded-xl px-4 py-3 text-white font-medium outline-none transition focus:ring-2 focus:ring-violet-500/50 cursor-pointer"
+                       style="background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); color-scheme: dark;">
+            </div>
+        </div>
+        <button type="submit" class="btn-primary py-3 px-10 font-bold rounded-xl">
+            + Create Goal
+        </button>
+    </form>
+</div>
+
+<!-- Goals List -->
+<div class="fade-up-2">
+    <h2 class="text-xl font-bold text-white mb-5">Your Goals</h2>
+
+    {% if goals %}
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {% for goal in goals %}
+        <div class="glass-card rounded-2xl p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-bold text-white">{{ goal.name }}</h3>
+                <!-- Progress badge -->
+                <span class="text-sm font-semibold px-3 py-1 rounded-full
+                    {% if goal.calculateProgress >= 100 %}
+                        " style="background: rgba(52,211,153,0.2); color: #34d399;">
+                        ✅ Complete
+                    {% elif goal.calculateProgress >= 75 %}
+                        " style="background: rgba(96,165,250,0.2); color: #60a5fa;">
+                        🔥 {{ goal.calculateProgress }}%
+                    {% else %}
+                        " style="background: rgba(167,139,250,0.2); color: #a78bfa;">
+                        🎯 {{ goal.calculateProgress }}%
+                    {% endif %}
+                </span>
+            </div>
+
+            <!-- Progress bar -->
+            <div class="mb-4">
+                <div class="h-3 rounded-full" style="background: rgba(255,255,255,0.08);">
+                    <div class="h-3 rounded-full transition-all"
+                         style="width: {% if goal.calculateProgress > 100 %}100{% else %}{{ goal.calculateProgress }}{% endif %}%;
+                                background: {% if goal.calculateProgress >= 100 %}linear-gradient(90deg,#34d399,#10b981){% elif goal.calculateProgress >= 75 %}linear-gradient(90deg,#60a5fa,#a78bfa){% else %}linear-gradient(90deg,#a78bfa,#60a5fa){% endif %};">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Amounts -->
+            <div class="flex justify-between text-sm mb-3">
+                <span class="text-white/50">Saved: <strong class="text-white">{{ goal.currentAmount }} EGP</strong></span>
+                <span class="text-white/50">Target: <strong class="text-white">{{ goal.targetAmount }} EGP</strong></span>
+            </div>
+
+            <!-- Deadline -->
+            <div class="flex items-center gap-2 text-white/30 text-xs">
+                <span>📅</span>
+                <span>Deadline: {{ goal.deadline }}</span>
+            </div>
+
+            <!-- Update current amount form -->
+            <form method="POST" action="/api/goals-view/update/" class="mt-4 flex gap-2">
+                {% csrf_token %}
+                <input type="hidden" name="goal_id" value="{{ goal.id }}">
+                <input type="number" name="currentAmount" placeholder="Update saved amount"
+                       value="{{ goal.currentAmount }}" min="0" step="0.01"
+                       class="flex-1 rounded-xl px-3 py-2 text-white placeholder-white/25 text-sm outline-none transition focus:ring-2 focus:ring-violet-500/50"
+                       style="background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);">
+                <button type="submit"
+                        class="rounded-xl px-4 py-2 text-sm font-semibold transition"
+                        style="background: rgba(167,139,250,0.2); border: 1px solid rgba(167,139,250,0.4); color: #a78bfa;">
+                    Update
+                </button>
+            </form>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% else %}
+    <div class="glass-card rounded-2xl p-16 text-center text-white/30">
+        <span class="text-5xl mb-4 block">🎯</span>
+        <p class="font-medium">No savings goals yet</p>
+        <p class="text-sm mt-1">Create your first goal above to get started!</p>
+    </div>
+    {% endif %}
+</div>
+
+<div class="text-center mt-10">
+    <a href="/api/home/" class="text-white/30 hover:text-white/60 text-sm transition">← Back to Dashboard</a>
+</div>
+
+{% endblock %}

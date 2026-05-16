@@ -4,38 +4,60 @@
 
 <div class="max-w-lg mx-auto fade-up">
 
-    <!-- Header -->
     <div class="text-center mb-8">
-        <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4" style="background: linear-gradient(135deg, rgba(167,139,250,0.2), rgba(96,165,250,0.2)); border: 1px solid rgba(167,139,250,0.3);">
+        <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4"
+             style="background: linear-gradient(135deg, rgba(167,139,250,0.2), rgba(96,165,250,0.2)); border: 1px solid rgba(167,139,250,0.3);">
             🎯
         </div>
         <h2 class="text-3xl font-extrabold text-white">Set Budget</h2>
         <p class="text-white/40 mt-1">Define a spending limit for a category</p>
     </div>
 
-    <!-- Form Card -->
+    {% if error %}
+    <div class="mb-6 rounded-xl px-4 py-3 flex items-center gap-2"
+         style="background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.3);">
+        <span>⚠️</span>
+        <p class="text-red-400 text-sm font-medium">{{ error }}</p>
+    </div>
+    {% endif %}
+
+    {% if success %}
+    <div class="mb-6 rounded-xl px-4 py-3 flex items-center gap-2"
+         style="background: rgba(52,211,153,0.1); border: 1px solid rgba(52,211,153,0.3);">
+        <span>✅</span>
+        <p class="text-emerald-400 text-sm font-medium">{{ success }}</p>
+    </div>
+    {% endif %}
+
     <div class="glass-card rounded-2xl p-8">
-        <form method="POST" action="/api/set-budget/">
+        <form method="POST" action="/set-budget-view/">
             {% csrf_token %}
 
-            <!-- Category -->
             <div class="mb-6">
                 <label class="block text-white/70 text-sm font-semibold mb-2 uppercase tracking-wider">Category</label>
-                <input type="text" name="category_name"
-                       placeholder="e.g. Food, Transport, Rent"
+                <input type="text" name="category_name" placeholder="e.g. Food, Transport, Rent"
                        class="w-full rounded-xl px-4 py-3 text-white placeholder-white/25 font-medium outline-none transition focus:ring-2 focus:ring-violet-500/50"
                        style="background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);">
             </div>
 
-            <!-- Budget Amount -->
             <div class="mb-6">
                 <label class="block text-white/70 text-sm font-semibold mb-2 uppercase tracking-wider">Budget Limit (EGP)</label>
-                <input type="number" name="amount" placeholder="0.00"
+                <input type="number" name="amount" placeholder="0.00" min="1" step="0.01"
                        class="w-full rounded-xl px-4 py-3 text-white placeholder-white/25 font-medium outline-none transition focus:ring-2 focus:ring-violet-500/50"
                        style="background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);">
             </div>
 
-            <!-- Date Range -->
+            <div class="mb-6">
+                <label class="block text-white/70 text-sm font-semibold mb-2 uppercase tracking-wider">
+                    Warning Threshold (%)
+                    <span class="text-white/30 normal-case font-normal ml-1">— alert me when I reach this % of my limit</span>
+                </label>
+                <input type="number" name="alertThreshold" value="80" min="1" max="100"
+                       class="w-full rounded-xl px-4 py-3 text-white placeholder-white/25 font-medium outline-none transition focus:ring-2 focus:ring-violet-500/50"
+                       style="background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);">
+                <p class="text-white/30 text-xs mt-1">Default is 80%. You'll be warned when spending crosses this threshold.</p>
+            </div>
+
             <div class="grid grid-cols-2 gap-4 mb-8">
                 <div>
                     <label class="block text-white/70 text-sm font-semibold mb-2 uppercase tracking-wider">Start Date</label>
@@ -51,7 +73,6 @@
                 </div>
             </div>
 
-            <!-- Submit -->
             <button type="submit" class="btn-primary w-full py-4 text-base font-bold rounded-xl text-center">
                 Set Budget
             </button>
@@ -59,7 +80,7 @@
     </div>
 
     <div class="text-center mt-6">
-        <a href="/api/home/" class="text-white/30 hover:text-white/60 text-sm transition">← Back to Dashboard</a>
+        <a href="/home/" class="text-white/30 hover:text-white/60 text-sm transition">← Back to Dashboard</a>
     </div>
 
 </div>

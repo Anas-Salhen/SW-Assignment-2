@@ -4,6 +4,7 @@ from .views import RegisterView, LoginView, AddIncomeView, AddExpenseView, Month
 
 urlpatterns = [
     # HTML views
+    path('', views.register_view, name='register'),
     path('login-view/', views.login_view, name='login'),
     path('register-view/', views.register_view, name='register'),
     path('logout/', views.logout_view, name='logout'),
@@ -12,7 +13,7 @@ urlpatterns = [
     path('set-budget-view/', views.set_budget_view, name='set_budget_view'),
     path('view-balance-view/', views.view_balance_view, name='view_balance_view'),
     path('report-view/', views.report_view, name='report_view'),
-
+    path('goals-view/', views.goals_view, name='goals_view'),
     # API endpoints
     path('register/', RegisterView.as_view()),
     path('login/', LoginView.as_view()),

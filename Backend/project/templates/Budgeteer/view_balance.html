@@ -4,18 +4,17 @@
 
 <div class="max-w-lg mx-auto fade-up">
 
-    <!-- Header -->
     <div class="text-center mb-8">
-        <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4" style="background: linear-gradient(135deg, rgba(52,211,153,0.2), rgba(96,165,250,0.2)); border: 1px solid rgba(52,211,153,0.3);">
+        <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4"
+             style="background: linear-gradient(135deg, rgba(52,211,153,0.2), rgba(96,165,250,0.2)); border: 1px solid rgba(52,211,153,0.3);">
             💼
         </div>
         <h2 class="text-3xl font-extrabold text-white">Budget Balance</h2>
         <p class="text-white/40 mt-1">Check your remaining budget by category</p>
     </div>
 
-    <!-- Search Form -->
     <div class="glass-card rounded-2xl p-8 mb-6">
-        <form method="GET" action="/api/view-balance/">
+        <form method="GET" action="/view-balance-view/">
             <div class="mb-6">
                 <label class="block text-white/70 text-sm font-semibold mb-2 uppercase tracking-wider">Category</label>
                 <input type="text" name="category"
@@ -30,33 +29,57 @@
         </form>
     </div>
 
-    <!-- Result -->
     {% if remaining is not None %}
     <div class="glass-card rounded-2xl p-8 text-center fade-up-2">
+
         <p class="text-white/50 text-sm uppercase tracking-widest font-semibold mb-2">Remaining Budget</p>
-        <h3 class="text-5xl font-extrabold {% if remaining >= 0 %}text-emerald-400{% else %}text-red-400{% endif %} mb-2">
+
+        <h3 class="text-5xl font-extrabold mb-4
+            {% if remaining >= 0 %}text-emerald-400{% else %}text-red-400{% endif %}">
             {{ remaining }} <span class="text-2xl font-normal text-white/40">EGP</span>
         </h3>
-        {% if remaining < 0 %}
-        <div class="mt-4 flex items-center justify-center gap-2 text-red-400 text-sm font-medium">
-            <span>⚠️</span> You have exceeded your budget!
-        </div>
-        {% else %}
-        <div class="mt-4 flex items-center justify-center gap-2 text-emerald-400 text-sm font-medium">
-            <span>✅</span> You are within your budget.
+
+        {% if budget_percent is not None %}
+        <div class="mb-4">
+            <div class="h-3 rounded-full w-full" style="background: rgba(255,255,255,0.08);">
+                <div class="h-3 rounded-full transition-all"
+                     style="width: {% if budget_percent > 100 %}100{% else %}{{ budget_percent }}{% endif %}%;
+                            background: {% if budget_percent >= 100 %}linear-gradient(90deg,#f87171,#ef4444){% elif budget_percent >= alert_threshold %}linear-gradient(90deg,#fbbf24,#f59e0b){% else %}linear-gradient(90deg,#34d399,#10b981){% endif %};">
+                </div>
+            </div>
+            <p class="text-white/30 text-xs mt-1 text-right">{{ budget_percent }}% used</p>
         </div>
         {% endif %}
+
+        {% if remaining < 0 %}
+        <div class="inline-flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold"
+             style="background: rgba(248,113,113,0.15); border: 1px solid rgba(248,113,113,0.4); color: #f87171;">
+            🚨 Status: <strong>Exceeded</strong> — You have gone over your budget!
+        </div>
+        {% elif budget_percent >= alert_threshold %}
+        <div class="inline-flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold"
+             style="background: rgba(251,191,36,0.15); border: 1px solid rgba(251,191,36,0.4); color: #fbbf24;">
+            ⚠️ Status: <strong>Warning</strong> — You are approaching your limit!
+        </div>
+        {% else %}
+        <div class="inline-flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold"
+             style="background: rgba(52,211,153,0.15); border: 1px solid rgba(52,211,153,0.4); color: #34d399;">
+            ✅ Status: <strong>Healthy</strong> — You are within your budget.
+        </div>
+        {% endif %}
+
     </div>
     {% endif %}
 
     {% if error %}
-    <div class="glass-card rounded-2xl p-6 text-center fade-up-2" style="border-color: rgba(248,113,113,0.3);">
+    <div class="glass-card rounded-2xl p-6 text-center fade-up-2"
+         style="border-color: rgba(248,113,113,0.3);">
         <span class="text-red-400 font-medium">⚠️ {{ error }}</span>
     </div>
     {% endif %}
 
     <div class="text-center mt-6">
-        <a href="/api/home/" class="text-white/30 hover:text-white/60 text-sm transition">← Back to Dashboard</a>
+        <a href="/home/" class="text-white/30 hover:text-white/60 text-sm transition">← Back to Dashboard</a>
     </div>
 
 </div>

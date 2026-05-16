@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model, logout
 from .services import AuthManager, TransactionManager, BudgetManager
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
-from .models import Transaction
+from .models import Transaction ,SavingsGoal
 from django.db.models import Sum
 
 User = get_user_model()
@@ -18,7 +18,7 @@ User = get_user_model()
 
 def login_view(request):
     if request.user.is_authenticated:
-        return redirect('/api/home/')
+        return redirect('/home/')
 
     error = None
     if request.method == 'POST':
@@ -31,7 +31,7 @@ def login_view(request):
             manager = AuthManager()
             try:
                 manager.login(request, username, password)
-                return redirect('/api/home/')
+                return redirect('/home/')
             except ValueError:
                 error = 'Invalid username or password.'
             except Exception:
@@ -42,7 +42,7 @@ def login_view(request):
 
 def register_view(request):
     if request.user.is_authenticated:
-        return redirect('/api/home/')
+        return redirect('/home/')
 
     error = None
     success = None
@@ -72,12 +72,12 @@ def register_view(request):
 
 def logout_view(request):
     logout(request)
-    return redirect('/api/login-view/')
+    return redirect('/login-view/')
 
 
 def index_view(request):
     if not request.user.is_authenticated:
-        return redirect('/api/login-view/')
+        return redirect('/login-view/')
 
     total_income = Transaction.objects.filter(
         user=request.user, transaction_type='income'
@@ -100,7 +100,7 @@ def index_view(request):
 
 def add_transaction_view(request):
     if not request.user.is_authenticated:
-        return redirect('/api/login-view/')
+        return redirect('/login-view/')
 
     if request.method == 'POST':
         title = request.POST.get('title')
@@ -120,7 +120,7 @@ def add_transaction_view(request):
 
 def set_budget_view(request):
     if not request.user.is_authenticated:
-        return redirect('/api/login-view/')
+        return redirect('/login-view/')
 
     error = None
     success = None
@@ -152,7 +152,7 @@ def set_budget_view(request):
 
 def view_balance_view(request):
     if not request.user.is_authenticated:
-        return redirect('/api/login-view/')
+        return redirect('/login-view/')
 
     remaining = None
     error = None
@@ -176,7 +176,7 @@ def view_balance_view(request):
 
 def report_view(request):
     if not request.user.is_authenticated:
-        return redirect('/api/login-view/')
+        return redirect('/login-view/')
 
     report = None
     error = None
@@ -193,6 +193,31 @@ def report_view(request):
         'report': report,
         'error': error
     })
+
+def goals_view(request):
+    if not request.user.is_authenticated:
+        return redirect('/login-view/')
+
+    error, success = None, None
+    if request.method == 'POST':
+        name          = request.POST.get('name')
+        targetAmount  = request.POST.get('targetAmount')
+        currentAmount = request.POST.get('currentAmount', 0)
+        deadline      = request.POST.get('deadline')
+        if not name or not targetAmount or not deadline:
+            error = 'Please fill in all fields.'
+        else:
+            SavingsGoal.objects.create(
+                user=request.user, name=name,
+                targetAmount=targetAmount,
+                currentAmount=currentAmount,
+                deadline=deadline
+            )
+            success = f'Goal "{name}" created!'
+
+    goals = SavingsGoal.objects.filter(user=request.user)
+    return render(request, 'Budgeteer/savings_goals.html',
+                  {'goals': goals, 'error': error, 'success': success})
 
 
 # ───────────────────────────────────────────
